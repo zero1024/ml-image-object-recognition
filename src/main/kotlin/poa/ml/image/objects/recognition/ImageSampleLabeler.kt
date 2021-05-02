@@ -23,7 +23,7 @@ class ImageSampleLabeler {
 
     private suspend fun showDialogAndLabel(image: BufferedImage): Boolean {
         val res = CompletableDeferred<Boolean>()
-        showImage(image) { frame ->
+        showImage(image.resized(200)) { frame ->
             val yes = JButton("Yes")
                 .apply {
                     addActionListener {
