@@ -2,8 +2,8 @@ package poa.ml.image.objects.recognition
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import smile.base.mlp.*
-import smile.classification.mlp
+import smile.classification.svm
+import smile.math.kernel.GaussianKernel
 import smile.math.matrix.Matrix
 import java.awt.image.BufferedImage
 import java.io.File
@@ -12,8 +12,8 @@ import javax.imageio.ImageIO
 class Tester {
 
     private val imageSamplesCollector = ImageSamplesCollector(
-        pxlStep = 100,
-        slideSize = 100
+        pxlStep = 60,
+        slideSize = 60
     )
     private val imageSampleLabeler = ImageSampleLabeler()
 
@@ -24,7 +24,7 @@ class Tester {
         runBlocking {
             val testImage = testImage().resized(targetHeight = 600)
             val samples = imageSamplesCollector.collect(testImage)
-            val labeledSamples = imageSampleLabeler.label(samples)
+            val labeledSamples = imageSampleLabeler.label(samples, testImage)
             val (X, y) = toTrainingSet(labeledSamples)
 
             val center = X.colMeans()
@@ -32,11 +32,13 @@ class Tester {
 
             val xScaled = X.scale(center, scale).toArray()
 
-            val classifier = mlp(xScaled, y, arrayOf(Layer.sigmoid(10), Layer.mle(1, OutputFunction.SIGMOID)))
+//            val classifier = mlp(xScaled, y, arrayOf(Layer.sigmoid(10), Layer.mle(1, OutputFunction.SIGMOID)))
+//            val classifier = logit(xScaled, y)
+            val classifier = svm(xScaled, y, GaussianKernel(4.0), 1.0)
 
             for (sample in samples) {
                 val image = sample.image
-                val array = Matrix(toDoubleArray(image)).scale(center, scale).col(0)
+                val array = Matrix(arrayOf(toDoubleArray(image))).scale(center, scale).row(0)
                 val label = classifier.predict(array)
                 if (label == 1) {
                     showImage(image)

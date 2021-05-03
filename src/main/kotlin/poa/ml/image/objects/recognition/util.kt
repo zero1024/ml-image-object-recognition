@@ -19,8 +19,8 @@ fun showImage(image: BufferedImage, lambda: (JFrame) -> Unit = {}) {
     frame.contentPane.add(JLabel(ImageIcon(image)))
     frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     lambda(frame)
-    frame.setLocation(dim.width / 2 - frame.size.width / 2, dim.height / 2 - frame.size.height / 2)
     frame.pack()
+    frame.setLocation(dim.width / 2 - frame.size.width / 2, dim.height / 2 - frame.size.height / 2)
     frame.isVisible = true
 }
 
@@ -34,11 +34,15 @@ fun BufferedImage.resized(targetHeight: Int): BufferedImage {
     return resizedImage
 }
 
+fun BufferedImage.clone(): BufferedImage {
+    return resized(this.height)
+}
+
 fun toTrainingSet(samples: List<Pair<Sample, Boolean>>): Pair<Matrix, IntArray> {
     val rows = mutableListOf<DoubleArray>()
     val labels = mutableListOf<Int>()
     for ((sample, label) in samples) {
-        labels.add(if (label) 1 else 0)
+        labels.add(if (label) 1 else -1)
         val image = sample.image
         val array = toDoubleArray(image)
         rows.add(array)
