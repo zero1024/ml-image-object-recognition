@@ -4,7 +4,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import smile.classification.svm
 import smile.math.kernel.GaussianKernel
-import smile.math.matrix.Matrix
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -36,14 +35,20 @@ class Tester {
 //            val classifier = logit(xScaled, y)
             val classifier = svm(xScaled, y, GaussianKernel(4.0), 1.0)
 
-            for (sample in samples) {
-                val image = sample.image
-                val array = Matrix(arrayOf(toDoubleArray(image))).scale(center, scale).row(0)
-                val label = classifier.predict(array)
-                if (label == 1) {
-                    showImage(image)
-                }
+
+            val areaSums = samples
+                .map { toDoubleArray(it.image).scale(center, scale) to it }
+                .map { (array, sample) -> classifier.predict(array) to sample }
+                .filter { (label, _) -> label == 1 }
+                .map { (_, sample) -> sample.toArea() }
+                .let { AreaSums(it) }
+
+            var resultImage = testImage
+            for (areaSum in areaSums) {
+                resultImage = highlightArea(resultImage, areaSum)
             }
+            showImage(resultImage)
+
             Thread.sleep(100000000)
 
         }

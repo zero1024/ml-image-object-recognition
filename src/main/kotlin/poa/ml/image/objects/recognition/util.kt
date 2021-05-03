@@ -5,6 +5,7 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.Toolkit
+import java.awt.geom.Area
 import java.awt.image.BufferedImage
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -38,6 +39,10 @@ fun BufferedImage.clone(): BufferedImage {
     return resized(this.height)
 }
 
+fun Area.copy(): Area {
+    return Area(this)
+}
+
 fun toTrainingSet(samples: List<Pair<Sample, Boolean>>): Pair<Matrix, IntArray> {
     val rows = mutableListOf<DoubleArray>()
     val labels = mutableListOf<Int>()
@@ -61,4 +66,30 @@ fun toDoubleArray(image: BufferedImage): DoubleArray {
         }
     }
     return row.toDoubleArray()
+}
+
+fun DoubleArray.scale(center: DoubleArray, scale: DoubleArray) =
+    Matrix(arrayOf(this)).scale(center, scale).row(0)
+
+fun highlightArea(sourceImage: BufferedImage, area: Area): BufferedImage {
+    val rect = area.bounds2D
+    val startX = rect.x.toInt()
+    val startY = rect.y.toInt()
+    val height = rect.height.toInt()
+    val width = rect.width.toInt()
+    val res = sourceImage.clone()
+    for (x in startX until startX + width) {
+        res.setRGB(x, startY, Color.WHITE.rgb)
+    }
+    for (x in startX until startX + width) {
+        res.setRGB(x, startY + height - 1, Color.WHITE.rgb)
+    }
+    for (y in startY until startY + height) {
+        res.setRGB(startX, y, Color.WHITE.rgb)
+    }
+    for (y in startY until startY + height) {
+        res.setRGB(startX + width - 1, y, Color.WHITE.rgb)
+    }
+
+    return res
 }
