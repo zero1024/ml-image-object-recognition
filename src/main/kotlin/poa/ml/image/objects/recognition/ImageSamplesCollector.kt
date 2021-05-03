@@ -1,7 +1,7 @@
 package poa.ml.image.objects.recognition
 
+import poa.ml.image.objects.recognition.model.Sample
 import java.awt.image.BufferedImage
-import kotlin.math.max
 import kotlin.math.min
 
 class ImageSamplesCollector(

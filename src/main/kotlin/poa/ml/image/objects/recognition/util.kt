@@ -1,5 +1,6 @@
 package poa.ml.image.objects.recognition
 
+import poa.ml.image.objects.recognition.model.Sample
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.Dimension

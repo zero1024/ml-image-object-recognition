@@ -3,6 +3,7 @@ package poa.ml.image.objects.recognition
 import poa.ml.image.objects.recognition.labeler.DrawableJLabel
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import poa.ml.image.objects.recognition.labeler.ImageCutter
 import poa.ml.image.objects.recognition.labeler.ImageSampleLabeler
 import smile.classification.svm
 import smile.math.kernel.GaussianKernel
@@ -17,6 +18,7 @@ class Tester {
         slideSize = 61
     )
     private val imageSampleLabeler = ImageSampleLabeler()
+    private val imageCutter = ImageCutter()
 
 
     @Test
@@ -24,8 +26,8 @@ class Tester {
 
         runBlocking {
             val testImage = testImage().resized(targetHeight = 600)
-            showJLabel(DrawableJLabel(testImage))
-            Thread.sleep(1000000)
+            imageCutter.cut(testImage)
+
             val samples = imageSamplesCollector.collect(testImage)
             val labeledSamples = imageSampleLabeler.label(samples, testImage)
             val (X, y) = toTrainingSet(labeledSamples)
