@@ -11,8 +11,8 @@ import javax.imageio.ImageIO
 class Tester {
 
     private val imageSamplesCollector = ImageSamplesCollector(
-        pxlStep = 60,
-        slideSize = 60
+        pxlStep = 53,
+        slideSize = 61
     )
     private val imageSampleLabeler = ImageSampleLabeler()
 
