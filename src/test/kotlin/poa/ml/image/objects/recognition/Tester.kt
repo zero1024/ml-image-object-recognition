@@ -1,7 +1,9 @@
 package poa.ml.image.objects.recognition
 
+import poa.ml.image.objects.recognition.labeler.DrawableJLabel
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import poa.ml.image.objects.recognition.labeler.ImageSampleLabeler
 import smile.classification.svm
 import smile.math.kernel.GaussianKernel
 import java.awt.image.BufferedImage
@@ -22,6 +24,8 @@ class Tester {
 
         runBlocking {
             val testImage = testImage().resized(targetHeight = 600)
+            showJLabel(DrawableJLabel(testImage))
+            Thread.sleep(1000000)
             val samples = imageSamplesCollector.collect(testImage)
             val labeledSamples = imageSampleLabeler.label(samples, testImage)
             val (X, y) = toTrainingSet(labeledSamples)

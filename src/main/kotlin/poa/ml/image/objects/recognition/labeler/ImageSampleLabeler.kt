@@ -1,8 +1,11 @@
-package poa.ml.image.objects.recognition
+package poa.ml.image.objects.recognition.labeler
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import poa.ml.image.objects.recognition.Sample
+import poa.ml.image.objects.recognition.highlightArea
+import poa.ml.image.objects.recognition.showImage
 import java.awt.image.BufferedImage
 import javax.swing.JButton
 

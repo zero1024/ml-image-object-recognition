@@ -14,10 +14,14 @@ import javax.swing.WindowConstants
 
 
 fun showImage(image: BufferedImage, lambda: (JFrame) -> Unit = {}) {
+    showJLabel(JLabel(ImageIcon(image)), lambda)
+}
+
+fun showJLabel(jLabel: JLabel, lambda: (JFrame) -> Unit = {}) {
     val frame = JFrame()
     val dim: Dimension = Toolkit.getDefaultToolkit().screenSize
     frame.contentPane.layout = FlowLayout()
-    frame.contentPane.add(JLabel(ImageIcon(image)))
+    frame.contentPane.add(jLabel)
     frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     lambda(frame)
     frame.pack()
