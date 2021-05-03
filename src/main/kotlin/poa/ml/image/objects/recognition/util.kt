@@ -52,7 +52,7 @@ fun toTrainingSet(samples: List<Pair<Sample, Boolean>>): Pair<Matrix, IntArray> 
     val rows = mutableListOf<DoubleArray>()
     val labels = mutableListOf<Int>()
     for ((sample, label) in samples) {
-        labels.add(if (label) 1 else -1)
+        labels.add(if (label) 1 else 0)
         val image = sample.image
         val array = toDoubleArray(image)
         rows.add(array)

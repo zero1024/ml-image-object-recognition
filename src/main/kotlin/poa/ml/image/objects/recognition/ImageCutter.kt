@@ -1,10 +1,8 @@
-package poa.ml.image.objects.recognition.labeler
+package poa.ml.image.objects.recognition
 
 import kotlinx.coroutines.CompletableDeferred
-import poa.ml.image.objects.recognition.clone
+import poa.ml.image.objects.recognition.labeler.DrawableJLabel
 import poa.ml.image.objects.recognition.model.Sample
-import poa.ml.image.objects.recognition.showImage
-import poa.ml.image.objects.recognition.showJLabel
 import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import javax.swing.JButton

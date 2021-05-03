@@ -1,12 +1,13 @@
 package poa.ml.image.objects.recognition
 
-import poa.ml.image.objects.recognition.labeler.DrawableJLabel
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import poa.ml.image.objects.recognition.labeler.ImageCutter
-import poa.ml.image.objects.recognition.labeler.ImageSampleLabeler
-import smile.classification.svm
-import smile.math.kernel.GaussianKernel
+import poa.ml.image.objects.recognition.labeler.FixedImageSampleLabeler
+import poa.ml.image.objects.recognition.labeler.ManualImageSampleLabeler
+import poa.ml.image.objects.recognition.model.Sample
+import smile.base.mlp.Layer
+import smile.base.mlp.OutputFunction
+import smile.classification.mlp
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -17,19 +18,28 @@ class Tester {
         pxlStep = 53,
         slideSize = 61
     )
-    private val imageSampleLabeler = ImageSampleLabeler()
+    private val manualImageSampleLabeler = ManualImageSampleLabeler()
+    private val negativeImageSampleLabeler = FixedImageSampleLabeler(false)
     private val imageCutter = ImageCutter()
-
 
     @Test
     internal fun testAllTheThings() {
 
         runBlocking {
+            val labeledSamples = mutableListOf<Pair<Sample, Boolean>>()
             val testImage = testImage().resized(targetHeight = 600)
-            imageCutter.cut(testImage)
+            val (goodChunk, badChunks) = imageCutter.cut(testImage)
 
-            val samples = imageSamplesCollector.collect(testImage)
-            val labeledSamples = imageSampleLabeler.label(samples, testImage)
+            for (badChunk in badChunks) {
+                val chunkSamples = imageSamplesCollector.collect(badChunk.image)
+                negativeImageSampleLabeler.label(chunkSamples, badChunk.image)
+                    .apply { labeledSamples.addAll(this) }
+            }
+            val chunkSamples = imageSamplesCollector.collect(goodChunk.image)
+            manualImageSampleLabeler.label(chunkSamples, goodChunk.image)
+                .apply { labeledSamples.addAll(this) }
+
+
             val (X, y) = toTrainingSet(labeledSamples)
 
             val center = X.colMeans()
@@ -37,11 +47,11 @@ class Tester {
 
             val xScaled = X.scale(center, scale).toArray()
 
-//            val classifier = mlp(xScaled, y, arrayOf(Layer.sigmoid(10), Layer.mle(1, OutputFunction.SIGMOID)))
+            val classifier = mlp(xScaled, y, arrayOf(Layer.sigmoid(10), Layer.mle(1, OutputFunction.SIGMOID)))
 //            val classifier = logit(xScaled, y)
-            val classifier = svm(xScaled, y, GaussianKernel(4.0), 1.0)
+//            val classifier = svm(xScaled, y, GaussianKernel(4.0), 1.0)
 
-
+            val samples = imageSamplesCollector.collect(testImage)
             val areaSums = samples
                 .map { toDoubleArray(it.image).scale(center, scale) to it }
                 .map { (array, sample) -> classifier.predict(array) to sample }

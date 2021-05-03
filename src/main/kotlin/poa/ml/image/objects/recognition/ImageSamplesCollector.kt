@@ -17,15 +17,17 @@ class ImageSamplesCollector(
         val list = mutableListOf<Sample>()
         for (y in 0 until image.height step pxlStep) {
             for (x in 0 until image.width step pxlStep) {
-                val resultX = min(x, image.width - slideSize)
-                val resultY = min(y, image.height - slideSize)
-                val sub = image.getSubimage(
-                    resultX,
-                    resultY,
-                    slideSize,
-                    slideSize
-                )
-                list.add(Sample(resultX, resultY, sub))
+                if (image.width >= slideSize && image.height >= slideSize) {
+                    val resultX = min(x, image.width - slideSize)
+                    val resultY = min(y, image.height - slideSize)
+                    val sub = image.getSubimage(
+                        resultX,
+                        resultY,
+                        slideSize,
+                        slideSize
+                    )
+                    list.add(Sample(resultX, resultY, sub))
+                }
             }
         }
         return list
