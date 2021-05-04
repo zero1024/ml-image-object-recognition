@@ -1,15 +1,15 @@
 package poa.ml.image.objects.recognition.labeler
 
 import kotlinx.coroutines.CompletableDeferred
-import poa.ml.image.objects.recognition.model.Sample
 import poa.ml.image.objects.recognition.highlightArea
+import poa.ml.image.objects.recognition.model.Sample
 import poa.ml.image.objects.recognition.showImage
 import java.awt.image.BufferedImage
 import javax.swing.JButton
 
-class ManualImageSampleLabeler : ImageSampleLabeler {
+class ManualImageSampleLabeler {
 
-    override suspend fun label(samples: List<Sample>, sourceImage: BufferedImage): List<Pair<Sample, Boolean>> {
+    suspend fun label(samples: List<Sample>, sourceImage: BufferedImage): List<Pair<Sample, Boolean>> {
         val res = mutableListOf<Pair<Sample, Boolean>>()
         var cur = 0
         while (cur < samples.size) {

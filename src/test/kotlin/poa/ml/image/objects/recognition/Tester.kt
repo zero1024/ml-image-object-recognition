@@ -8,6 +8,7 @@ import poa.ml.image.objects.recognition.model.LabeledTrainingSet
 import smile.base.mlp.Layer
 import smile.base.mlp.OutputFunction
 import smile.classification.mlp
+import java.awt.Toolkit
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -23,7 +24,7 @@ class Tester {
         slideSize = 61
     )
     private val manualImageSampleLabeler = ManualImageSampleLabeler()
-    private val negativeImageSampleLabeler = FixedImageSampleLabeler(false)
+    private val imageSampleLabeler = FixedImageSampleLabeler()
     private val imageCutter = ImageCutter()
 
     @Test
@@ -37,13 +38,27 @@ class Tester {
 
             for (badChunk in badChunks) {
                 val chunkSamples = smallStepSampleCollector.collect(badChunk.image)
-                negativeImageSampleLabeler.label(chunkSamples, badChunk.image)
+                imageSampleLabeler.label(chunkSamples, false)
                     .apply { labeledTrainingSet.add(this) }
             }
+
             val chunkSamples = samplesCollector.collect(goodChunk.image)
-            manualImageSampleLabeler.label(chunkSamples, goodChunk.image)
+            val goodSamples = manualImageSampleLabeler.label(chunkSamples, goodChunk.image)
+
+            goodSamples
+                .filter { (_, label) -> !label }
                 .apply { labeledTrainingSet.add(this) }
 
+            val positiveSamples = goodSamples.filter { (_, label) -> label }
+            labeledTrainingSet.add(positiveSamples)
+
+            positiveSamples
+                .map { (sample, _) -> sample.toArea() }
+                .let { AreaSums(it) }.forEach {
+                    val samples = smallStepSampleCollector.collect(goodChunk.image, it)
+                    imageSampleLabeler.label(samples, true)
+                        .apply { labeledTrainingSet.add(this) }
+                }
 
             val (X, y) = labeledTrainingSet.toMatrix()
 
@@ -64,11 +79,13 @@ class Tester {
                 .map { (_, sample) -> sample.toArea() }
                 .let { AreaSums(it) }
 
-            var resultImage = testImage()
+            val screenSize = Toolkit.getDefaultToolkit().screenSize.height.toDouble() * 0.8
+            var (anotherScaleK, resultImage) = resize(testImage(), screenSize.toInt())
             for (area in areaSums) {
-                resultImage = highlightArea(resultImage, area.scaled(1 / scaleK))
+                resultImage = highlightArea(resultImage, area.scaled(scaleK / anotherScaleK))
             }
             showImage(resultImage)
+
 
             Thread.sleep(100000000)
 
