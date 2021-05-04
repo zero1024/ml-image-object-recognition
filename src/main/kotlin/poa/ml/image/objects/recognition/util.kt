@@ -1,5 +1,6 @@
 package poa.ml.image.objects.recognition
 
+import org.apache.commons.io.FileUtils
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.Dimension
@@ -8,6 +9,7 @@ import java.awt.Toolkit
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.image.BufferedImage
+import java.lang.management.ManagementFactory
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
@@ -97,5 +99,9 @@ fun walkFileTree(path: String, lambda: (BufferedImage) -> Unit) {
 
         private fun String.isImage() = endsWith(".jpg") || endsWith(".png") || endsWith(".jpeg")
     })
+}
 
+fun memoryUsed(): String {
+    val memoryMXBean = ManagementFactory.getMemoryMXBean()
+    return FileUtils.byteCountToDisplaySize(memoryMXBean.heapMemoryUsage.used)
 }

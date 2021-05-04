@@ -29,7 +29,10 @@ class ModelTrainer {
 
                 val resizedImg = img.resized(targetHeight = 600)
 
-                val (goodChunk, badChunks) = imageCutter.cut(resizedImg, "Image №${counter.incrementAndGet()}")
+                val (goodChunk, badChunks) = imageCutter.cut(
+                    resizedImg,
+                    "Image №${counter.incrementAndGet()}. Memory used :${memoryUsed()}"
+                )
 
                 for (badChunk in badChunks) {
                     val negativeSamples = smallStepSampleCollector.collect(badChunk.image)
