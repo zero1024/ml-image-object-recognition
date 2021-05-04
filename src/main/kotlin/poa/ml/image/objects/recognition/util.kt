@@ -1,6 +1,5 @@
 package poa.ml.image.objects.recognition
 
-import poa.ml.image.objects.recognition.model.Sample
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.Dimension
@@ -9,6 +8,12 @@ import java.awt.Toolkit
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.image.BufferedImage
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
+import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -72,4 +77,25 @@ fun highlightArea(sourceImage: BufferedImage, area: Area): BufferedImage {
     val res = sourceImage.clone()
     res.createGraphics().draw(area)
     return res
+}
+
+fun walkFileTree(path: String): List<BufferedImage> {
+    val res = mutableListOf<BufferedImage>()
+    walkFileTree(path) { res.add(it) }
+    return res
+}
+
+fun walkFileTree(path: String, lambda: (BufferedImage) -> Unit) {
+    Files.walkFileTree(Path.of(path), object : SimpleFileVisitor<Path>() {
+        override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+            if (file.toFile().name.isImage()) {
+                val image = ImageIO.read(file.toFile())
+                lambda(image)
+            }
+            return FileVisitResult.CONTINUE
+        }
+
+        private fun String.isImage() = endsWith(".jpg") || endsWith(".png") || endsWith(".jpeg")
+    })
+
 }
