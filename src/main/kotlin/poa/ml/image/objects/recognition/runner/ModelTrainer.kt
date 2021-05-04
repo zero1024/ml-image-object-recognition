@@ -10,16 +10,20 @@ import java.util.concurrent.atomic.AtomicInteger
 class ModelTrainer {
 
     private val samplesCollector = ImageSamplesCollector(
-        pxlStep = 53,
-        slideSize = 61
+        pxlStep = 50,
+        slideSize = 60
     )
     private val smallStepSampleCollector = ImageSamplesCollector(
-        pxlStep = 20,
-        slideSize = 61
+        pxlStep = 30,
+        slideSize = 60
+    )
+    private val verySmallStepSampleCollector = ImageSamplesCollector(
+        pxlStep = 5,
+        slideSize = 60
     )
     private val manualImageSampleLabeler = ManualImageSampleLabeler()
     private val imageSampleLabeler = FixedImageSampleLabeler()
-    private val imageCutter = ImageCutter()
+    private val imageCutter = ImageCutter(minSize = 60)
 
     fun train(dir: String, fileToSave: String) {
         val labeledTrainingSet = LabeledTrainingSet()
@@ -27,7 +31,7 @@ class ModelTrainer {
         walkFileTree(dir) { img ->
             runBlocking {
 
-                val resizedImg = img.resized(targetHeight = 600)
+                val resizedImg = img.resized(targetHeight = 400)
 
                 val (goodChunk, badChunks) = imageCutter.cut(
                     resizedImg,
@@ -53,7 +57,7 @@ class ModelTrainer {
                 positiveSamples
                     .map { (sample, _) -> sample.toArea() }
                     .let { AreaSums(it) }.forEach {
-                        val samples = smallStepSampleCollector.collect(goodChunk.image, it)
+                        val samples = verySmallStepSampleCollector.collect(goodChunk.image, it)
                         imageSampleLabeler.label(samples, true)
                             .apply { labeledTrainingSet.add(this) }
                     }

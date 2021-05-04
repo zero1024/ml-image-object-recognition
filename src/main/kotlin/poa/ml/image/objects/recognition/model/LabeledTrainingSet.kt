@@ -7,6 +7,13 @@ import smile.math.matrix.Matrix
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.swing.ProgressMonitorInputStream
+
+import java.io.BufferedInputStream
+
+import java.io.InputStream
+import javax.swing.JFrame
+
 
 class LabeledTrainingSet(
     private val rows: CopyOnWriteArrayList<DoubleArray>,
@@ -43,10 +50,15 @@ class LabeledTrainingSet(
 
     companion object {
         fun fromFile(file: String): LabeledTrainingSet {
-            FileInputStream(file).use {
+            BufferedInputStream(
+                ProgressMonitorInputStream(
+                    JFrame(),
+                    "Reading $file",
+                    FileInputStream(file)
+                )
+            ).use {
                 val (rows, labels) = deserialize(it) as Pair<CopyOnWriteArrayList<DoubleArray>, CopyOnWriteArrayList<Int>>
                 return LabeledTrainingSet(rows, labels)
-
             }
         }
     }

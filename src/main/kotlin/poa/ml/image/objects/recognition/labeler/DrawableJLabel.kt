@@ -15,7 +15,7 @@ import kotlin.math.abs
 import kotlin.math.min
 
 
-class DrawableJLabel(image: BufferedImage) : JLabel(ImageIcon(image.clone())) {
+class DrawableJLabel(image: BufferedImage, minSize: Int) : JLabel(ImageIcon(image.clone())) {
 
     private var p1: Point = Point(0, 0)
     private var p2: Point = Point(0, 0)
@@ -39,8 +39,10 @@ class DrawableJLabel(image: BufferedImage) : JLabel(ImageIcon(image.clone())) {
         })
         addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseDragged(e: MouseEvent) {
-                p2 = e.point
-                repaint()
+                if (abs(e.point.x - p1.x) > minSize && abs(e.point.y - p1.y) > minSize) {
+                    p2 = e.point
+                    repaint()
+                }
             }
         })
     }

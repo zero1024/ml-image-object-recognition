@@ -20,25 +20,25 @@ import javax.imageio.ImageIO
 class Tester {
 
     private val samplesCollector = ImageSamplesCollector(
-        pxlStep = 53,
-        slideSize = 61
+        pxlStep = 50,
+        slideSize = 60
     )
     private val smallStepSampleCollector = ImageSamplesCollector(
-        pxlStep = 20,
-        slideSize = 61
+        pxlStep = 30,
+        slideSize = 60
     )
     private val manualImageSampleLabeler = ManualImageSampleLabeler()
     private val imageSampleLabeler = FixedImageSampleLabeler()
-    private val imageCutter = ImageCutter()
+    private val imageCutter = ImageCutter(60)
 
     @Test
     internal fun train() {
-        ModelTrainer().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/trainingSet")
+        ModelTrainer().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/heart.ts")
     }
 
     @Test
     internal fun test() {
-        ModelTester().test("/Users/oleg1024/Downloads/divan/trainingSet")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart.ts")
     }
 
     @Test
@@ -127,7 +127,7 @@ class Tester {
         runBlocking {
             val labeledTrainingSet = LabeledTrainingSet()
 
-            val (scaleK, testImage) = resize(testImage(), targetHeight = 600)
+            val (scaleK, testImage) = resize(testImage(), targetHeight = 400)
             val (goodChunk, badChunks) = imageCutter.cut(testImage)
 
             for (badChunk in badChunks) {

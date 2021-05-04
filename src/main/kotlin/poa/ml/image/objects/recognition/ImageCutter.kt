@@ -7,11 +7,11 @@ import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import javax.swing.JButton
 
-class ImageCutter {
+class ImageCutter(private val minSize: Int) {
 
     suspend fun cut(image: BufferedImage, frameName: String = "Cut"): Pair<Sample, List<Sample>> {
         val res = CompletableDeferred<Rectangle>()
-        val drawableJLabel = DrawableJLabel(image.clone())
+        val drawableJLabel = DrawableJLabel(image.clone(),minSize)
         showJLabel(drawableJLabel) { frame ->
             frame.title = frameName
             val yes = JButton("Cut")
