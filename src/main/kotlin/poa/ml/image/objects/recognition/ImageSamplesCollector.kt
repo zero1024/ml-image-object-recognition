@@ -9,15 +9,20 @@ class ImageSamplesCollector(
     private val slideSize: Int = 50
 ) {
 
+
+    private val ignorablePxlStep = slideSize / 5
+
     init {
         assert(slideSize >= pxlStep) { "slide size should be greater than or equal to pxl step" }
     }
 
     fun collect(image: BufferedImage): List<Sample> {
+        if (image.width < slideSize || image.height < slideSize)
+            return emptyList()
         val list = mutableListOf<Sample>()
         for (y in 0 until image.height step pxlStep) {
             for (x in 0 until image.width step pxlStep) {
-                if (image.width >= slideSize && image.height >= slideSize) {
+                if (x < image.width - ignorablePxlStep && y < image.height - ignorablePxlStep) {
                     val resultX = min(x, image.width - slideSize)
                     val resultY = min(y, image.height - slideSize)
                     val sub = image.getSubimage(
