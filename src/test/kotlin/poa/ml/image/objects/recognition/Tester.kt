@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test
 import poa.ml.image.objects.recognition.labeler.FixedImageSampleLabeler
 import poa.ml.image.objects.recognition.labeler.ManualImageSampleLabeler
 import poa.ml.image.objects.recognition.model.LabeledTrainingSet
+import poa.ml.image.objects.recognition.runner.ModelTester
+import poa.ml.image.objects.recognition.runner.ModelTrainer
 import smile.base.mlp.Layer
 import smile.base.mlp.OutputFunction
 import smile.classification.mlp
@@ -28,6 +30,16 @@ class Tester {
     private val manualImageSampleLabeler = ManualImageSampleLabeler()
     private val imageSampleLabeler = FixedImageSampleLabeler()
     private val imageCutter = ImageCutter()
+
+    @Test
+    internal fun train() {
+        ModelTrainer().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/trainingSet")
+    }
+
+    @Test
+    internal fun test() {
+        ModelTester().test("/Users/oleg1024/Downloads/divan/trainingSet")
+    }
 
     @Test
     internal fun testWithDir() {

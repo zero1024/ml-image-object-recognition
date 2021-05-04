@@ -9,10 +9,11 @@ import javax.swing.JButton
 
 class ImageCutter {
 
-    suspend fun cut(image: BufferedImage): Pair<Sample, List<Sample>> {
+    suspend fun cut(image: BufferedImage, frameName: String = "Cut"): Pair<Sample, List<Sample>> {
         val res = CompletableDeferred<Rectangle>()
         val drawableJLabel = DrawableJLabel(image.clone())
         showJLabel(drawableJLabel) { frame ->
+            frame.title = frameName
             val yes = JButton("Cut")
                 .apply {
                     addActionListener {
