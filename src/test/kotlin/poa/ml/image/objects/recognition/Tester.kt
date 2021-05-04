@@ -8,6 +8,7 @@ import poa.ml.image.objects.recognition.model.Sample
 import smile.base.mlp.Layer
 import smile.base.mlp.OutputFunction
 import smile.classification.mlp
+import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -27,7 +28,7 @@ class Tester {
 
         runBlocking {
             val labeledSamples = mutableListOf<Pair<Sample, Boolean>>()
-            val testImage = testImage().resized(targetHeight = 600)
+            val (scaleK, testImage) = resize(testImage(), targetHeight = 600)
             val (goodChunk, badChunks) = imageCutter.cut(testImage)
 
             for (badChunk in badChunks) {
@@ -59,9 +60,9 @@ class Tester {
                 .map { (_, sample) -> sample.toArea() }
                 .let { AreaSums(it) }
 
-            var resultImage = testImage
-            for (areaSum in areaSums) {
-                resultImage = highlightArea(resultImage, areaSum)
+            var resultImage = testImage()
+            for (area in areaSums) {
+                resultImage = highlightArea(resultImage, area.scaled(1 / scaleK))
             }
             showImage(resultImage)
 
