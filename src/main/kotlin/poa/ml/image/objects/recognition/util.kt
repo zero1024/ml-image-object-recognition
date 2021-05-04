@@ -51,17 +51,6 @@ fun Area.copy() = Area(this)
 
 fun Area.scaled(scaleK: Double) = createTransformedArea(AffineTransform.getScaleInstance(1 / scaleK, 1 / scaleK))
 
-fun toTrainingSet(samples: List<Pair<Sample, Boolean>>): Pair<Matrix, IntArray> {
-    val rows = mutableListOf<DoubleArray>()
-    val labels = mutableListOf<Int>()
-    for ((sample, label) in samples) {
-        labels.add(if (label) 1 else 0)
-        val image = sample.image
-        val array = toDoubleArray(image)
-        rows.add(array)
-    }
-    return Matrix(rows.toTypedArray()) to labels.toIntArray()
-}
 
 fun toDoubleArray(image: BufferedImage): DoubleArray {
     val row = mutableListOf<Double>()
