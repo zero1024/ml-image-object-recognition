@@ -2,11 +2,12 @@ package poa.ml.image.objects.recognition.model
 
 import poa.ml.image.objects.recognition.toDoubleArray
 import smile.math.matrix.Matrix
+import java.util.concurrent.CopyOnWriteArrayList
 
 class LabeledTrainingSet {
 
-    private val rows = mutableListOf<DoubleArray>()
-    private val labels = mutableListOf<Int>()
+    private val rows = CopyOnWriteArrayList<DoubleArray>()
+    private val labels = CopyOnWriteArrayList<Int>()
 
     fun add(samples: List<Pair<Sample, Boolean>>) {
         for ((sample, label) in samples) {
