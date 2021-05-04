@@ -22,6 +22,7 @@ repositories {
 def smile_version = "2.6.0"
 
 dependencies {
+    implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
     implementation "org.bytedeco:javacv-platform:1.5.5"
     implementation "com.github.haifengl:smile-kotlin:$smile_version"
     implementation "com.github.haifengl:smile-plot:$smile_version"
@@ -33,4 +34,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    maxHeapSize "8G"
 }

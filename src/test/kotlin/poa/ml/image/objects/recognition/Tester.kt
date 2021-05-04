@@ -1,6 +1,7 @@
 package poa.ml.image.objects.recognition
 
 import kotlinx.coroutines.runBlocking
+import org.apache.commons.io.FileUtils.byteCountToDisplaySize
 import org.junit.jupiter.api.Test
 import poa.ml.image.objects.recognition.labeler.FixedImageSampleLabeler
 import poa.ml.image.objects.recognition.labeler.ManualImageSampleLabeler
@@ -11,6 +12,7 @@ import smile.classification.mlp
 import java.awt.Toolkit
 import java.awt.image.BufferedImage
 import java.io.File
+import java.lang.management.ManagementFactory
 import javax.imageio.ImageIO
 
 class Tester {
@@ -86,6 +88,10 @@ class Tester {
             }
             showImage(resultImage)
 
+            val memoryMXBean = ManagementFactory.getMemoryMXBean()
+            println("Init:" + byteCountToDisplaySize(memoryMXBean.heapMemoryUsage.init))
+            println("Used:" + byteCountToDisplaySize(memoryMXBean.heapMemoryUsage.used))
+            println("Max:" + byteCountToDisplaySize(memoryMXBean.heapMemoryUsage.max))
 
             Thread.sleep(100000000)
 
