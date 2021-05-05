@@ -45,13 +45,6 @@ class LabeledTrainingSet(
         return Matrix(X) to y
     }
 
-    fun toMatrix(from: Int = 0, size: Int): Pair<Matrix, IntArray> {
-        val subList = rows.subList(from, size)
-        val X = subList.map { it.first }.toTypedArray()
-        val y = subList.map { it.second }.toIntArray()
-        return Matrix(X) to y
-    }
-
     fun means(): DoubleArray {
         val res = DoubleArray(means!!.length())
         for (i in 0 until means!!.length()) {
