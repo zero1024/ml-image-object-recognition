@@ -18,7 +18,7 @@ class ModelTrainer {
         slideSize = 60
     )
     private val verySmallStepSampleCollector = ImageSamplesCollector(
-        pxlStep = 5,
+        pxlStep = 18,
         slideSize = 60
     )
     private val manualImageSampleLabeler = ManualImageSampleLabeler()
@@ -63,10 +63,21 @@ class ModelTrainer {
                     }
             }
         }
-        labeledTrainingSet.save(fileToSave)
-        println("===Training set with ${labeledTrainingSet.size()} rows saved.")
+
+        labeledTrainingSet.shuffle()
+
+        val rowsNumber = labeledTrainingSet.size()
+        val positiveLabelsPercentage = labeledTrainingSet.positiveLabelsPercentage()
+
+        println("===Converting to matrix...")
+        val (X, y) = labeledTrainingSet.toMatrix()
+        println("===Done converting")
+
+        X.saveToFile("$fileToSave.X")
+        y.saveToFile("$fileToSave.y")
+        println("===Training set with $rowsNumber rows saved.")
         println("===Path: $fileToSave")
-        println("===Positive labels percentage: ${labeledTrainingSet.positiveLabelsPercentage()}%")
+        println("===Positive labels percentage: $positiveLabelsPercentage%")
         println("")
     }
 

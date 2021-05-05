@@ -1,6 +1,7 @@
 package poa.ml.image.objects.recognition
 
 import org.apache.commons.io.FileUtils
+import org.apache.commons.lang3.SerializationUtils
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.Dimension
@@ -9,6 +10,10 @@ import java.awt.Toolkit
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.image.BufferedImage
+import java.io.BufferedInputStream
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.Serializable
 import java.lang.management.ManagementFactory
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -16,10 +21,7 @@ import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import javax.imageio.ImageIO
-import javax.swing.ImageIcon
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.WindowConstants
+import javax.swing.*
 
 
 fun showImage(image: BufferedImage, lambda: (JFrame) -> Unit = {}) {
@@ -104,4 +106,22 @@ fun walkFileTree(path: String, lambda: (BufferedImage) -> Unit) {
 fun memoryUsed(): String {
     val memoryMXBean = ManagementFactory.getMemoryMXBean()
     return FileUtils.byteCountToDisplaySize(memoryMXBean.heapMemoryUsage.used)
+}
+
+fun Serializable.saveToFile(file: String) {
+    FileOutputStream(file).use {
+        SerializationUtils.serialize(this, it)
+    }
+}
+
+fun <T : Serializable> readFromFile(file: String): T {
+    return BufferedInputStream(
+        ProgressMonitorInputStream(
+            JFrame(),
+            "Reading $file",
+            FileInputStream(file)
+        )
+    ).use {
+        SerializationUtils.deserialize(it) as T
+    }
 }

@@ -1,66 +1,44 @@
 package poa.ml.image.objects.recognition.model
 
-import org.apache.commons.lang3.SerializationUtils.deserialize
-import org.apache.commons.lang3.SerializationUtils.serialize
 import poa.ml.image.objects.recognition.toDoubleArray
 import smile.math.matrix.Matrix
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.io.Serializable
 import java.util.concurrent.CopyOnWriteArrayList
-import javax.swing.ProgressMonitorInputStream
-
-import java.io.BufferedInputStream
-
-import java.io.InputStream
-import javax.swing.JFrame
 
 
 class LabeledTrainingSet(
-    private val rows: CopyOnWriteArrayList<DoubleArray>,
-    private val labels: CopyOnWriteArrayList<Int>
-) {
+    private val rows: CopyOnWriteArrayList<Pair<DoubleArray, Int>>
+) : Serializable {
 
-    constructor() : this(CopyOnWriteArrayList<DoubleArray>(), CopyOnWriteArrayList<Int>())
+    constructor() : this(CopyOnWriteArrayList<Pair<DoubleArray, Int>>())
 
     fun size() = rows.size
 
     fun positiveLabelsPercentage(): Int {
-        val positive = labels.filter { it == 1 }.size
+        val positive = rows.filter { it.second == 1 }.size
         return (positive * 100) / size()
     }
 
     fun add(samples: List<Pair<Sample, Boolean>>) {
         for ((sample, label) in samples) {
-            labels.add(if (label) 1 else 0)
             val image = sample.image
             val array = toDoubleArray(image)
-            rows.add(array)
+            rows.add(array to if (label) 1 else 0)
         }
     }
+
+    fun shuffle() = rows.shuffle()
 
     fun toMatrix(): Pair<Matrix, IntArray> {
-        return Matrix(rows.toTypedArray()) to labels.toIntArray()
+        val X = rows.map { it.first }.toTypedArray()
+        val y = rows.map { it.second }.toIntArray()
+        return Matrix(X) to y
     }
 
-    fun save(file: String) {
-        FileOutputStream(file).use {
-            serialize(rows to labels, it)
-        }
+    fun toMatrix(from: Int = 0, size: Int): Pair<Matrix, IntArray> {
+        val subList = rows.subList(from, size)
+        val X = subList.map { it.first }.toTypedArray()
+        val y = subList.map { it.second }.toIntArray()
+        return Matrix(X) to y
     }
-
-    companion object {
-        fun fromFile(file: String): LabeledTrainingSet {
-            BufferedInputStream(
-                ProgressMonitorInputStream(
-                    JFrame(),
-                    "Reading $file",
-                    FileInputStream(file)
-                )
-            ).use {
-                val (rows, labels) = deserialize(it) as Pair<CopyOnWriteArrayList<DoubleArray>, CopyOnWriteArrayList<Int>>
-                return LabeledTrainingSet(rows, labels)
-            }
-        }
-    }
-
 }

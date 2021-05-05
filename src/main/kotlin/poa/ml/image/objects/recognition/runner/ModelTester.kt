@@ -1,15 +1,16 @@
 package poa.ml.image.objects.recognition.runner
 
-import poa.ml.image.objects.recognition.model.LabeledTrainingSet
+import poa.ml.image.objects.recognition.readFromFile
 import smile.base.mlp.Layer
 import smile.base.mlp.OutputFunction
 import smile.classification.mlp
+import smile.math.matrix.Matrix
 
 class ModelTester {
 
     fun test(trainingSetFile: String) {
-        val trainingSet = LabeledTrainingSet.fromFile(trainingSetFile)
-        val (X, y) = trainingSet.toMatrix()
+        val X = readFromFile<Matrix>("$trainingSetFile.X")
+        val y = readFromFile<IntArray>("$trainingSetFile.y")
 
         val center = X.colMeans()
         val scale = X.colSds()
