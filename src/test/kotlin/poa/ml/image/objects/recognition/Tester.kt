@@ -156,8 +156,8 @@ class Tester {
 
             val (X, y) = labeledTrainingSet.toMatrix()
 
-            val center = X.colMeans()
-            val scale = X.colSds()
+            val center = labeledTrainingSet.means()
+            val scale = labeledTrainingSet.sds()
 
             val xScaled = X.scale(center, scale).toArray()
 

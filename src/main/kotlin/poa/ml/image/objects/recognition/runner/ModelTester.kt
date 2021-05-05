@@ -11,9 +11,7 @@ class ModelTester {
     fun test(trainingSetFile: String) {
         val X = readFromFile<Matrix>("$trainingSetFile.X")
         val y = readFromFile<IntArray>("$trainingSetFile.y")
-
-        val center = X.colMeans()
-        val scale = X.colSds()
+        val (center, scale) = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
 
         val xScaled = X.scale(center, scale).toArray()
 
