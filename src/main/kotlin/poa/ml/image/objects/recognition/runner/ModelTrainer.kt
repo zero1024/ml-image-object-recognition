@@ -71,24 +71,21 @@ class ModelTrainer {
 
         val centerAndScale = labeledTrainingSet.means() to labeledTrainingSet.sds()
 
-        println("===Converting to matrix...")
+        printlnStart("===Converting to matrix...")
         val (X, y) = labeledTrainingSet.toMatrix()
-        println("===Done converting. Size ${X.nrows()}x${X.ncols()}")
-        println("")
+        printlnEnd("===Done converting. Size ${X.nrows()}x${X.ncols()}")
 
-        println("===Scaling matrix...")
+        printlnStart("===Scaling matrix...")
         val Xscaled = X.scale(centerAndScale.first, centerAndScale.second)
-        println("===Done scaling")
-        println("")
+        printlnEnd("===Done scaling")
 
-        println("===Saving to file...")
+        printlnStart("===Saving to file...")
         centerAndScale.saveToFile("$fileToSave.options")
         Xscaled.saveToFile("$fileToSave.X")
         y.saveToFile("$fileToSave.y")
-        println("===Training set with $rowsNumber rows saved.")
+        printlnEnd("===Training set with $rowsNumber rows saved.")
         println("===Path: $fileToSave")
         println("===Positive labels percentage: $positiveLabelsPercentage%")
-        println("")
     }
 
 }

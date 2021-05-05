@@ -125,3 +125,14 @@ fun <T : Serializable> readFromFile(file: String): T {
         SerializationUtils.deserialize(it) as T
     }
 }
+
+val timestamp = ThreadLocal<Long>()
+fun printlnStart(s: String) {
+    timestamp.set(System.currentTimeMillis())
+    println(s)
+}
+
+fun printlnEnd(s: String) {
+    println(s + " Took ${(System.currentTimeMillis() - timestamp.get()) / 1000} s.")
+    println("")
+}
