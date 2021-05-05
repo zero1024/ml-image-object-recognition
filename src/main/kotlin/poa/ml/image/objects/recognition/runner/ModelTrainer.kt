@@ -73,12 +73,15 @@ class ModelTrainer {
 
         println("===Converting to matrix...")
         val (X, y) = labeledTrainingSet.toMatrix()
-        println("===Done converting")
+        println("===Done converting. Size ${X.nrows()}x${X.ncols()}")
+        println("")
 
         println("===Scaling matrix...")
         val Xscaled = X.scale(centerAndScale.first, centerAndScale.second)
         println("===Done scaling")
+        println("")
 
+        println("===Saving to file...")
         centerAndScale.saveToFile("$fileToSave.options")
         Xscaled.saveToFile("$fileToSave.X")
         y.saveToFile("$fileToSave.y")

@@ -33,12 +33,12 @@ class Tester {
 
     @Test
     internal fun train() {
-        ModelTrainer().train("/Users/oleg1024/Downloads/divan2/", "/Users/oleg1024/Downloads/divan2/heart")
+        ModelTrainer().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/heart")
     }
 
     @Test
     internal fun test() {
-        ModelTester().test("/Users/oleg1024/Downloads/divan2/heart")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart")
     }
 
     @Test
