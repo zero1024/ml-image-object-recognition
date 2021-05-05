@@ -2,7 +2,15 @@ package poa.ml.image.objects.recognition
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.SerializationUtils
+import smile.base.mlp.Layer
+import smile.base.mlp.LayerBuilder
+import smile.base.mlp.OutputFunction
+import smile.classification.Classifier
+import smile.classification.logit
+import smile.classification.mlp
 import smile.math.matrix.Matrix
+import smile.plot.swing.LinePlot
+import smile.plot.swing.ScatterPlot
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -20,6 +28,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
+import java.util.function.BiFunction
 import javax.imageio.ImageIO
 import javax.swing.*
 
@@ -135,4 +144,21 @@ fun printlnStart(s: String) {
 fun printlnEnd(s: String) {
     println(s + " Took ${(System.currentTimeMillis() - timestamp.get()) / 1000} s.")
     println("")
+}
+
+fun showPlot(array: Array<DoubleArray>) {
+    val plot = LinePlot.of(array)
+    plot.canvas().window().defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+}
+
+fun subSet(
+    X: Matrix,
+    y: IntArray,
+    nrows: Int
+): Pair<Matrix, IntArray> {
+    return if (nrows == -1) {
+        X to y
+    } else {
+        X.submatrix(0, 0, nrows - 1, X.ncols() - 1) to y.copyOf(nrows)
+    }
 }
