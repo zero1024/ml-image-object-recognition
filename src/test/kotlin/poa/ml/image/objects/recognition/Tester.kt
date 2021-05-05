@@ -39,6 +39,10 @@ class Tester {
     @Test
     internal fun test() {
         ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.6")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.12")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.12.6")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.18.12")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.18.12.6")
     }
 
     @Test
