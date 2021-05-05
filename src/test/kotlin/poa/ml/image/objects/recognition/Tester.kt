@@ -38,11 +38,22 @@ class Tester {
 
     @Test
     internal fun test() {
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.3")
         ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.6")
-        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.12")
-        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.12.6")
-        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.18.12")
-        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.18.12.6")
+        ModelTester().test("/Users/oleg1024/Downloads/divan/heart", "mlp.6.3")
+    }
+
+    @Test
+    internal fun logitTest() {
+        val modelTester = ModelTester()
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.0")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.0.01")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.0.03")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.0.1")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.0.3")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.1")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.3")
+        modelTester.test("/Users/oleg1024/Downloads/divan/heart", "logit.9")
     }
 
     @Test
