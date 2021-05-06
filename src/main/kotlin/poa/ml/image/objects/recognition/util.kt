@@ -2,15 +2,8 @@ package poa.ml.image.objects.recognition
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.SerializationUtils
-import smile.base.mlp.Layer
-import smile.base.mlp.LayerBuilder
-import smile.base.mlp.OutputFunction
-import smile.classification.Classifier
-import smile.classification.logit
-import smile.classification.mlp
 import smile.math.matrix.Matrix
 import smile.plot.swing.LinePlot
-import smile.plot.swing.ScatterPlot
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -28,7 +21,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import java.util.function.BiFunction
 import javax.imageio.ImageIO
 import javax.swing.*
 
@@ -161,4 +153,16 @@ fun subSet(
     } else {
         X.submatrix(0, 0, nrows - 1, X.ncols() - 1) to y.copyOf(nrows)
     }
+}
+
+fun rotate90(x: Array<DoubleArray>, ncols: Int): Array<DoubleArray> {
+    for (rIdx in x.indices) {
+        val list = mutableListOf<DoubleArray>()
+        val row = x[rIdx]
+        for (i in row.indices step ncols) {
+            list.add(row.copyOfRange(i, i + ncols))
+        }
+        x[rIdx] = Matrix(list.apply { reverse() }.toTypedArray()).transpose().toArray().flatMap { it.toList() }.toDoubleArray()
+    }
+    return x
 }

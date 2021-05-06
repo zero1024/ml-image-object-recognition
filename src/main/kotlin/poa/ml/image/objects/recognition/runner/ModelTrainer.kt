@@ -1,9 +1,6 @@
 package poa.ml.image.objects.recognition.runner
 
-import poa.ml.image.objects.recognition.printlnEnd
-import poa.ml.image.objects.recognition.printlnStart
-import poa.ml.image.objects.recognition.readFromFile
-import poa.ml.image.objects.recognition.subSet
+import poa.ml.image.objects.recognition.*
 import smile.base.mlp.Layer
 import smile.base.mlp.LayerBuilder
 import smile.base.mlp.OutputFunction
@@ -66,10 +63,35 @@ class ModelTrainer {
         printlnStart("===Reading the labels...")
         val y = readFromFile<IntArray>("$trainingSetFile.y")
         printlnEnd("===Done reading.")
+        val (subX, subY) = subSet(X, y, nrows)
         val ySvm = if (classifierCode.startsWith("svm_"))
-            y.map { if (it == 0) -1 else 1 }.toIntArray()
-        else y
-        return subSet(X, ySvm, nrows)
+            subY.map { if (it == 0) -1 else 1 }.toIntArray()
+        else subY
+//        printlnStart("===Rotating images 3 times to get more samples...")
+//        val res = rotatePositiveImages(subX, ySvm)
+//        printlnEnd("===Done rotating.")
+        return subX to subY
+    }
+
+    private fun rotatePositiveImages(X: Matrix, y: IntArray): Pair<Matrix, IntArray> {
+
+        val positiveX = mutableListOf<DoubleArray>()
+        val positiveY = mutableListOf<Int>()
+        for (i in y.indices) {
+            if (y[i] == 1) {
+                positiveX.add(X.row(i))
+                positiveY.add(y[i])
+            }
+        }
+
+        val x90 = rotate90(positiveX.toTypedArray(), 180)
+        val x180 = rotate90(x90.copyOf(), 180)
+        val x270 = rotate90(x180.copyOf(), 180)
+
+        val resultX = listOf(X.toArray(), x90, x180, x270).flatMap { it.toList() }
+        val resultY = listOf(y.toList(), positiveY, positiveY, positiveY).flatMap { it.toList() }
+
+        return Matrix(resultX.toTypedArray()) to resultY.toIntArray()
     }
 
 

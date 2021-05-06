@@ -14,6 +14,16 @@ class Tester {
     )
 
     @Test
+    internal fun testRotate() {
+        val rotated = rotate90(
+            arrayOf(
+                doubleArrayOf(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0)
+            ), 3
+        )
+        assert(rotated[0].contentEquals(doubleArrayOf(6.0, 3.0, 0.0, 7.0, 4.0, 1.0, 8.0, 5.0, 2.0)))
+    }
+
+    @Test
     internal fun train() {
         TrainingSetCollector().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/heart")
     }
@@ -48,7 +58,7 @@ class Tester {
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
 
 //        val classifier = modelTrainer.train(trainingSetFile, "logit_0.01", 5000)
-        val classifier = modelTrainer.train(trainingSetFile, "mlp_60", 5000)
+        val classifier = modelTrainer.train(trainingSetFile, "mlp_12", 5000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale
