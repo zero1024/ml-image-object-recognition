@@ -3,6 +3,9 @@ package poa.ml.image.objects.recognition
 import org.junit.jupiter.api.Test
 import poa.ml.image.objects.recognition.runner.ModelTrainer
 import poa.ml.image.objects.recognition.runner.TrainingSetCollector
+import smile.base.mlp.Layer
+import smile.base.mlp.OutputFunction
+import smile.classification.mlp
 import java.awt.Toolkit
 
 class Tester {
@@ -31,17 +34,17 @@ class Tester {
 
     @Test
     internal fun testLogitWithRespectToTheSizeOfTheInput() {
-        val (X, y) = modelTrainer.getTrainingSet("/Users/oleg1024/Downloads/divan/heart", "logit_0.01")
+        val (X, y) = modelTrainer.getTrainingSet("/Users/oleg1024/Downloads/divan/heart")
         val f1 = mutableListOf<DoubleArray>()
         val accuracy = mutableListOf<DoubleArray>()
         for (i in 50..500 step 10) {
-            val (subX, subY) = subSet(X, y, i)
+            val (subX, subY) = subSet(X, y, to = i)
             val classification = modelTrainer.test(subX, subY, "logit_0.01")
             f1.add(doubleArrayOf(i.toDouble(), classification.avg.f1))
             accuracy.add(doubleArrayOf(i.toDouble(), classification.avg.accuracy))
         }
-        showPlot(f1.toTypedArray())
-        showPlot(accuracy.toTypedArray())
+        linePlot(f1.toTypedArray())
+        linePlot(accuracy.toTypedArray())
         Thread.sleep(100000)
     }
 
@@ -53,12 +56,49 @@ class Tester {
     }
 
     @Test
+    internal fun testMlpConvergence() {
+
+        val nrows = 5000
+
+        val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
+        val (X, y) = modelTrainer.getTrainingSet(trainingSetFile)
+
+        val errorsStat = mutableListOf<Pair<DoubleArray, String>>()
+
+        val (trX, trY) = subSet(X, y, to = nrows)
+        val (cvX, cvY) = subSet(X, y, from = nrows + 1, to = nrows + 1 + (nrows / 2))
+
+        val array = trX.toArray()
+        val mlp = mlp(array, y, arrayOf(Layer.sigmoid(6), Layer.mle(2, OutputFunction.SIGMOID)), epochs = 0)
+
+        (0..500)
+            .forEach { iter ->
+                printlnStart("Iteration $iter")
+                mlp.update(array, trY)
+
+                val predictions = mlp.predict(array)
+                val misclassError = predictions.add(trY).filter { it == 1 }.size
+                val trPoint = doubleArrayOf(iter.toDouble(), misclassError.toDouble())
+                errorsStat.add(trPoint to "training")
+
+                val cvPredictions = mlp.predict(cvX.toArray())
+                val cvMisclassError = cvPredictions.add(cvY).filter { it == 1 }.size
+                val cvPoint = doubleArrayOf(iter.toDouble(), cvMisclassError.toDouble())
+                errorsStat.add(cvPoint to "cv")
+                printlnEnd("Done.")
+            }
+
+        scatterPlot(errorsStat.map { it.first }.toTypedArray(), errorsStat.map { it.second }.toTypedArray())
+        Thread.sleep(100000000)
+    }
+
+    @Test
     internal fun testWithDir() {
 
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
 
 //        val classifier = modelTrainer.train(trainingSetFile, "logit_0.01", 5000)
-        val classifier = modelTrainer.train(trainingSetFile, "mlp_6", 5000)
+        val classifier = modelTrainer.train(trainingSetFile, "mlp_12", 5000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale

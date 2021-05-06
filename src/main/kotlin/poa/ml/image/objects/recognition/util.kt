@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.SerializationUtils
 import smile.math.matrix.Matrix
 import smile.plot.swing.LinePlot
+import smile.plot.swing.ScatterPlot
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -138,20 +139,26 @@ fun printlnEnd(s: String) {
     println("")
 }
 
-fun showPlot(array: Array<DoubleArray>) {
+fun linePlot(array: Array<DoubleArray>) {
     val plot = LinePlot.of(array)
+    plot.canvas().window().defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+}
+
+fun scatterPlot(array: Array<DoubleArray>, labels: Array<String>) {
+    val plot = ScatterPlot.of(array, labels, '.')
     plot.canvas().window().defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
 }
 
 fun subSet(
     X: Matrix,
     y: IntArray,
-    nrows: Int
+    from: Int = 0,
+    to: Int
 ): Pair<Matrix, IntArray> {
-    return if (nrows == -1) {
+    return if (to == -1) {
         X to y
     } else {
-        X.submatrix(0, 0, nrows - 1, X.ncols() - 1) to y.copyOf(nrows)
+        X.submatrix(from, 0, to - 1, X.ncols() - 1) to y.copyOfRange(from, to)
     }
 }
 
@@ -162,7 +169,16 @@ fun rotate90(x: Array<DoubleArray>, ncols: Int): Array<DoubleArray> {
         for (i in row.indices step ncols) {
             list.add(row.copyOfRange(i, i + ncols))
         }
-        x[rIdx] = Matrix(list.apply { reverse() }.toTypedArray()).transpose().toArray().flatMap { it.toList() }.toDoubleArray()
+        x[rIdx] = Matrix(list.apply { reverse() }.toTypedArray()).transpose().toArray().flatMap { it.toList() }
+            .toDoubleArray()
     }
     return x
+}
+
+fun IntArray.add(x: IntArray): IntArray {
+    require(x.size == this.size) { String.format("Arrays have different length: x[%d], y[%d]", x.size, this.size) }
+    for (i in x.indices) {
+        this[i] += x[i]
+    }
+    return this
 }
