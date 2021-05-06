@@ -110,8 +110,7 @@ private fun dispatch(name: String): BiFunction<Array<DoubleArray>, IntArray, Cla
                     X,
                     y,
                     layers.toTypedArray(),
-                    weightDecay = 1.0,
-                    momentum = TimeFunction.constant(0.3)
+                    epochs = 500
                 )
             }
         }

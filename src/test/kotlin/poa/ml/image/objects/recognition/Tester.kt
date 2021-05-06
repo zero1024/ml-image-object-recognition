@@ -58,7 +58,7 @@ class Tester {
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
 
 //        val classifier = modelTrainer.train(trainingSetFile, "logit_0.01", 5000)
-        val classifier = modelTrainer.train(trainingSetFile, "mlp_12", 5000)
+        val classifier = modelTrainer.train(trainingSetFile, "mlp_6", 5000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale
