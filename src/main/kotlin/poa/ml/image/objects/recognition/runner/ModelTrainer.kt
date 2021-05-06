@@ -11,8 +11,8 @@ import smile.classification.Classifier
 import smile.classification.logit
 import smile.classification.mlp
 import smile.classification.svm
+import smile.math.TimeFunction
 import smile.math.kernel.GaussianKernel
-import smile.math.kernel.MercerKernel
 import smile.math.matrix.Matrix
 import smile.validation.ClassificationValidations
 import smile.validation.CrossValidation
@@ -83,7 +83,15 @@ private fun dispatch(name: String): BiFunction<Array<DoubleArray>, IntArray, Cla
                 .map { Layer.sigmoid(it) as LayerBuilder }
                 .toMutableList()
             layers.add(Layer.mle(2, OutputFunction.SIGMOID))
-            BiFunction { X, y -> mlp(X, y, layers.toTypedArray(), weightDecay = 0.03) }
+            BiFunction { X, y ->
+                mlp(
+                    X,
+                    y,
+                    layers.toTypedArray(),
+                    weightDecay = 1.0,
+                    momentum = TimeFunction.constant(0.3)
+                )
+            }
         }
         name.startsWith("logit_") -> {
             val lambda = name.split("_")[1]

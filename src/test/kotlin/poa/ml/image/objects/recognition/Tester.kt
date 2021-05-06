@@ -3,7 +3,6 @@ package poa.ml.image.objects.recognition
 import org.junit.jupiter.api.Test
 import poa.ml.image.objects.recognition.runner.ModelTrainer
 import poa.ml.image.objects.recognition.runner.TrainingSetCollector
-import smile.math.matrix.Matrix
 import java.awt.Toolkit
 
 class Tester {
@@ -19,22 +18,6 @@ class Tester {
         TrainingSetCollector().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/heart")
     }
 
-
-    @Test
-    internal fun testMlpWithRespectToTheSizeOfTheInput() {
-        val (X, y) = modelTrainer.getTrainingSet("/Users/oleg1024/Downloads/divan/heart", "mlp_2")
-        val f1 = mutableListOf<DoubleArray>()
-        val accuracy = mutableListOf<DoubleArray>()
-        for (i in 500..5000 step 500) {
-            val (subX, subY) = subSet(X, y, i)
-            val classification = modelTrainer.test(subX, subY, "mlp_2")
-            f1.add(doubleArrayOf(i.toDouble(), classification.avg.f1))
-            accuracy.add(doubleArrayOf(i.toDouble(), classification.avg.accuracy))
-        }
-        showPlot(f1.toTypedArray())
-        showPlot(accuracy.toTypedArray())
-        Thread.sleep(100000)
-    }
 
     @Test
     internal fun testLogitWithRespectToTheSizeOfTheInput() {
@@ -64,7 +47,8 @@ class Tester {
 
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
 
-        val classifier = modelTrainer.train(trainingSetFile, "logit_0.01", 1000)
+//        val classifier = modelTrainer.train(trainingSetFile, "logit_0.01", 5000)
+        val classifier = modelTrainer.train(trainingSetFile, "mlp_60", 5000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale
