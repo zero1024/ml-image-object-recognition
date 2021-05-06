@@ -19,22 +19,31 @@ class Tester {
         TrainingSetCollector().train("/Users/oleg1024/Downloads/divan/", "/Users/oleg1024/Downloads/divan/heart")
     }
 
+
     @Test
-    internal fun testMlp() {
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "mlp.2")
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "mlp.3")
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "mlp.6")
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "mlp.6.3")
+    internal fun testMlpWithRespectToTheSizeOfTheInput() {
+        val (X, y) = modelTrainer.getTrainingSet("/Users/oleg1024/Downloads/divan/heart", "mlp_2")
+        val f1 = mutableListOf<DoubleArray>()
+        val accuracy = mutableListOf<DoubleArray>()
+        for (i in 500..5000 step 500) {
+            val (subX, subY) = subSet(X, y, i)
+            val classification = modelTrainer.test(subX, subY, "mlp_2")
+            f1.add(doubleArrayOf(i.toDouble(), classification.avg.f1))
+            accuracy.add(doubleArrayOf(i.toDouble(), classification.avg.accuracy))
+        }
+        showPlot(f1.toTypedArray())
+        showPlot(accuracy.toTypedArray())
+        Thread.sleep(100000)
     }
 
     @Test
     internal fun testLogitWithRespectToTheSizeOfTheInput() {
-        val (X, y) = modelTrainer.getTrainingSet("/Users/oleg1024/Downloads/divan/heart")
+        val (X, y) = modelTrainer.getTrainingSet("/Users/oleg1024/Downloads/divan/heart", "logit_0.01")
         val f1 = mutableListOf<DoubleArray>()
         val accuracy = mutableListOf<DoubleArray>()
         for (i in 50..500 step 10) {
             val (subX, subY) = subSet(X, y, i)
-            val classification = modelTrainer.test(subX, subY, "logit.0.01")
+            val classification = modelTrainer.test(subX, subY, "logit_0.01")
             f1.add(doubleArrayOf(i.toDouble(), classification.avg.f1))
             accuracy.add(doubleArrayOf(i.toDouble(), classification.avg.accuracy))
         }
@@ -45,9 +54,9 @@ class Tester {
 
     @Test
     internal fun testLogit() {
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "logit.0")
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "logit.0.01") //the best
-        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "logit.0.03")
+        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "logit_0")
+        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "logit_0.01") //the best
+        modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "logit_0.03")
     }
 
     @Test
@@ -55,7 +64,7 @@ class Tester {
 
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
 
-        val classifier = modelTrainer.train(trainingSetFile, "logit.0.01", 500)
+        val classifier = modelTrainer.train(trainingSetFile, "logit_0.01", 1000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale
