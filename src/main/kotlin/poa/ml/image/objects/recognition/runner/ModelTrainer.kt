@@ -106,7 +106,8 @@ private fun dispatch(name: String): BiFunction<Array<DoubleArray>, IntArray, Cla
                     X,
                     y,
                     layers.toTypedArray(),
-                    epochs = 500
+                    epochs = 300,
+                    weightDecay = 0.003
                 )
             }
         }
