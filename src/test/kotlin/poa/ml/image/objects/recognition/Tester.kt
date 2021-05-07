@@ -1,6 +1,7 @@
 package poa.ml.image.objects.recognition
 
 import org.junit.jupiter.api.Test
+import poa.ml.image.objects.recognition.deeplearning4j.Dl4jNNClassifier
 import poa.ml.image.objects.recognition.runner.ModelTrainer
 import poa.ml.image.objects.recognition.runner.TrainingSetCollector
 import smile.base.mlp.Layer
@@ -58,7 +59,6 @@ class Tester {
     @Test
     internal fun testMlp() {
         modelTrainer.test("/Users/oleg1024/Downloads/iris/iris", "mlp_12")
-        modelTrainer.test("/Users/oleg1024/Downloads/iris/iris", "mlp_12_3")
     }
 
     @Test
@@ -67,19 +67,7 @@ class Tester {
     }
 
     @Test
-    internal fun testMlpLayers() {
-        val plot = mutableListOf<DoubleArray>()
-        for (i in 3..60 step 3) {
-            val validation = modelTrainer.test("/Users/oleg1024/Downloads/divan/heart", "mlp_$i", 3000)
-            plot.add(doubleArrayOf(i.toDouble(), validation.avg.accuracy))
-            linePlot(plot.toTypedArray())
-        }
-        linePlot(plot.toTypedArray())
-        Thread.sleep(1000000)
-    }
-
-    @Test
-    internal fun testMlpWitCv() {
+    internal fun testDl4jWitCv() {
 
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
         val (X, y) = modelTrainer.getTrainingSet(trainingSetFile)
@@ -87,9 +75,9 @@ class Tester {
         val errorsStat = mutableListOf<Pair<DoubleArray, String>>()
 
         val (trX, trY) = subSet(X, y, to = 21000)
-        val (cvX, cvY) = subSet(X, y, from = 21001, to = 26000)
+        val (cvX, cvY) = subSet(X, y, from = 21001, to = 23000)
 
-        (2000..20000 step 1000)
+        (100..5000 step 200)
             .forEach { iter ->
                 printlnStart("Iteration $iter")
 
@@ -97,24 +85,18 @@ class Tester {
 
                 val array = iterX.toArray()
 
-                val mlp = mlp(
-                    array,
-                    iterY,
-                    arrayOf(Layer.sigmoid(12), Layer.mle(2, OutputFunction.SIGMOID)),
-                    epochs = 500
-                )
+                val classifier = Dl4jNNClassifier(array, iterY)
 
-                val predictions = mlp.predict(array)
+                val predictions = classifier.predict(array)
                 val misclassError = predictions.add(iterY).filter { it == 1 }.size
                 val trPoint = doubleArrayOf(iter.toDouble(), misclassError.toDouble())
                 errorsStat.add(trPoint to "training")
 
-                val cvPredictions = mlp.predict(cvX.toArray())
+                val cvPredictions = classifier.predict(cvX.toArray())
                 val cvMisclassError = cvPredictions.add(cvY).filter { it == 1 }.size
                 val cvPoint = doubleArrayOf(iter.toDouble(), cvMisclassError.toDouble())
                 errorsStat.add(cvPoint to "cv")
                 printlnEnd("Done.")
-                scatterPlot(errorsStat.map { it.first }.toTypedArray(), errorsStat.map { it.second }.toTypedArray())
             }
 
         scatterPlot(errorsStat.map { it.first }.toTypedArray(), errorsStat.map { it.second }.toTypedArray())
@@ -122,34 +104,20 @@ class Tester {
     }
 
     @Test
-    internal fun testMlpConvergence() {
-
-        val nrows = 5000
+    internal fun testDl4jConvergence() {
 
         val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
         val (X, y) = modelTrainer.getTrainingSet(trainingSetFile)
 
-        val errorsStat = mutableListOf<Pair<DoubleArray, String>>()
+        val errorsStat = mutableListOf<DoubleArray>()
 
-        val (trX, trY) = subSet(X, y, to = nrows)
+        val classifier = Dl4jNNClassifier(X.toArray(), y)
+        for ((idx, iter) in classifier.scores.listIteration.elements().withIndex()) {
+            val score = classifier.scores.listScore.elements()[idx]
+            errorsStat.add(doubleArrayOf(iter.toDouble(), score))
+        }
 
-        val array = trX.toArray()
-        val mlp = mlp(array, y, arrayOf(Layer.sigmoid(12), Layer.mle(2, OutputFunction.SIGMOID)), epochs = 0)
-
-        (0..600)
-            .forEach { iter ->
-                printlnStart("Iteration $iter")
-                mlp.update(array, trY)
-
-                val predictions = mlp.predict(array)
-                val misclassError = predictions.add(trY).filter { it == 1 }.size
-                val trPoint = doubleArrayOf(iter.toDouble(), misclassError.toDouble())
-                errorsStat.add(trPoint to "training")
-
-                printlnEnd("Done.")
-            }
-
-        scatterPlot(errorsStat.map { it.first }.toTypedArray(), errorsStat.map { it.second }.toTypedArray())
+        linePlot(errorsStat.toTypedArray())
         Thread.sleep(100000000)
     }
 

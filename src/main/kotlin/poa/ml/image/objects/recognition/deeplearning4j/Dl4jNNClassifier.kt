@@ -6,26 +6,30 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer
 import org.deeplearning4j.nn.conf.layers.OutputLayer
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
 import org.deeplearning4j.nn.weights.WeightInit
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener
+import org.deeplearning4j.optimize.listeners.CollectScoresListener
 import org.nd4j.linalg.activations.Activation
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.learning.config.Nesterovs
 import org.nd4j.linalg.lossfunctions.LossFunctions
 import smile.classification.Classifier
 
-class Dl4jNNClassifier(X: Array<DoubleArray>, y: IntArray) : Classifier<DoubleArray> {
+class Dl4jNNClassifier(
+    X: Array<DoubleArray>,
+    y: IntArray,
+    nEpochs: Int = 400
+) : Classifier<DoubleArray> {
 
     private var model: MultiLayerNetwork
+    val scores = CollectScoresListener(10)
 
     init {
         val batchSize = 100
         val seed = 123
         val learningRate = 0.005
         //Number of epochs (full passes of the data)
-        val nEpochs = 500
         val numInputs = 10800
         val numOutputs = 2
-        val numHiddenNodes = 30
+        val numHiddenNodes = 20
 
         val trainIter = CustomArrayDataSetIterator(X, y, batchSize)
 
@@ -47,7 +51,7 @@ class Dl4jNNClassifier(X: Array<DoubleArray>, y: IntArray) : Classifier<DoubleAr
             .build()
         model = MultiLayerNetwork(conf)
         model.init()
-        model.setListeners(ScoreIterationListener(10)) //Print score every 10 parameter updates
+        model.setListeners(scores)
         model.fit(trainIter, nEpochs)
     }
 
