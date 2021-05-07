@@ -58,6 +58,12 @@ class Tester {
     @Test
     internal fun testMlp() {
         modelTrainer.test("/Users/oleg1024/Downloads/iris/iris", "mlp_12")
+        modelTrainer.test("/Users/oleg1024/Downloads/iris/iris", "mlp_12_3")
+    }
+
+    @Test
+    internal fun testDl4j() {
+        modelTrainer.test("/Users/oleg1024/Downloads/iris/iris", "dl4j")
     }
 
     @Test
@@ -150,14 +156,14 @@ class Tester {
     @Test
     internal fun testWithDir() {
 
-        val trainingSetFile = "/Users/oleg1024/Downloads/iris/iris"
+        val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
 
-        val classifier = modelTrainer.train(trainingSetFile, "mlp_12", 12000)
+        val classifier = modelTrainer.train(trainingSetFile, "dl4j", 14000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale
 
-        val images = walkFileTree("/Users/oleg1024/Downloads/iris/")
+        val images = walkFileTree("/Users/oleg1024/Downloads/divan/")
 
 
         for (image in images) {

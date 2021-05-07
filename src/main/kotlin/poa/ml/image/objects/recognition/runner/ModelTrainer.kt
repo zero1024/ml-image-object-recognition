@@ -1,6 +1,7 @@
 package poa.ml.image.objects.recognition.runner
 
 import poa.ml.image.objects.recognition.*
+import poa.ml.image.objects.recognition.deeplearning4j.Dl4jNNClassifier
 import smile.base.mlp.Layer
 import smile.base.mlp.LayerBuilder
 import smile.base.mlp.OutputFunction
@@ -118,6 +119,9 @@ private fun dispatch(name: String): BiFunction<Array<DoubleArray>, IntArray, Cla
         name.startsWith("svm_") -> {
             val (sigma, C) = name.split("_").let { it[1] to it[2] }
             BiFunction { X, y -> svm(X, y, GaussianKernel(sigma.toDouble()), C.toDouble()) }
+        }
+        name.startsWith("dl4j") -> {
+            BiFunction { X, y -> Dl4jNNClassifier(X, y) }
         }
         else -> {
             throw IllegalStateException()
