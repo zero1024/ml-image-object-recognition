@@ -156,14 +156,14 @@ class Tester {
     @Test
     internal fun testWithDir() {
 
-        val trainingSetFile = "/Users/oleg1024/Downloads/divan/heart"
+        val trainingSetFile = "/Users/oleg1024/Downloads/iris/iris"
 
-        val classifier = modelTrainer.train(trainingSetFile, "dl4j", 14000)
+        val classifier = modelTrainer.train(trainingSetFile, "dl4j", 16000)
 
         val centerAndScale = readFromFile<Pair<DoubleArray, DoubleArray>>("$trainingSetFile.options")
         val (center, scale) = centerAndScale
 
-        val images = walkFileTree("/Users/oleg1024/Downloads/divan/")
+        val images = walkFileTree("/Users/oleg1024/Downloads/iris/")
 
 
         for (image in images) {

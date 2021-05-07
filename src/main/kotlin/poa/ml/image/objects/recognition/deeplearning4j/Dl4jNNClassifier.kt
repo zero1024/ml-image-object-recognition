@@ -22,10 +22,10 @@ class Dl4jNNClassifier(X: Array<DoubleArray>, y: IntArray) : Classifier<DoubleAr
         val seed = 123
         val learningRate = 0.005
         //Number of epochs (full passes of the data)
-        val nEpochs = 300
+        val nEpochs = 500
         val numInputs = 10800
         val numOutputs = 2
-        val numHiddenNodes = 20
+        val numHiddenNodes = 30
 
         val trainIter = CustomArrayDataSetIterator(X, y, batchSize)
 
